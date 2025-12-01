@@ -42,6 +42,8 @@ class MiRPositionTypes(enum.IntEnum):
     SHELF = 5
     CHARGING_STATION = 20
     CHARGING_STATION_ENTRY = 21
+    VL_MARKER = 11
+    VL_MARKER_ENTRY = 12
     CART = 22
     LIFT = 25
     LIFT_ENTRY = 26
@@ -194,6 +196,7 @@ class MirAPI:
             elif pos['type_id'] == MiRPositionTypes.ROBOT or \
                     pos['type_id'] == MiRPositionTypes.SHELF or \
                     pos['type_id'] == MiRPositionTypes.CHARGING_STATION or \
+                    pos['type_id'] == MiRPositionTypes.VL_MARKER or \
                     pos['type_id'] == MiRPositionTypes.LIFT or \
                     pos['type_id'] == MiRPositionTypes.LIFT_ENTRY:
                 self.known_positions[pos['name']] = (
@@ -320,36 +323,50 @@ class MirAPI:
         if not end_wp:
             self.update_known_positions()
             end_wp = self.known_positions.get(end_waypoint)
-        assert end_wp is not None
+        assert end_wp is not None, (
+            f'end_wp not found in known_positions')
         end_wp_guid = end_wp.get('guid')
-        assert end_wp_guid is not None
+        assert end_wp_guid is not None, (
+            f'end_wp_guid is None')
         end_param = self.get_mission_params_with_value(
             mission_name, 'move', 'end_waypoint', end_wp_guid)
         dock_param = self.get_mission_params_with_value(
             mission_name, 'docking', 'end_waypoint', end_wp_guid)
-
+        assert end_param is not None, ("end_param is None")
         # Start waypoint is optional
         if start_waypoint is not None:
             start_wp = self.known_positions.get(start_waypoint)
             if not start_wp:
                 self.update_known_positions()
                 start_wp = self.known_positions.get(start_waypoint)
-            assert start_wp is not None
+            assert start_wp is not None, (
+                f'start_wp not found in known_positions')
             start_wp_guid = start_wp.get('guid')
-            assert start_wp_guid is not None
+            assert start_wp_guid is not None, (
+                f'start_wp is None')
             start_param = self.get_mission_params_with_value(
                 mission_name, 'move', 'start_waypoint', start_wp_guid)
             mission_params = start_param + end_param
 
         # Check whether we should dock into this end waypoint (for charging)
         elif dock_param:
-            charger_marker_type = self.marker_type_keys['charger']
-            charger_marker_type_guid = self.docking_offsets_guid_get(
-                charger_marker_type)
-            marker_param = self.get_mission_params_with_value(
-                mission_name, 'docking', 'charger_marker_type',
-                charger_marker_type_guid)
-            mission_params = end_param + dock_param + marker_param
+            if mission_name == "rmf_dock_and_charge":
+                charger_marker_type = self.marker_type_keys['charger']
+                charger_marker_type_guid = self.docking_offsets_guid_get(
+                    charger_marker_type)
+                marker_param = self.get_mission_params_with_value(
+                    mission_name, 'docking', 'charger_marker_type',
+                    charger_marker_type_guid)
+                mission_params = end_param + dock_param + marker_param
+            elif mission_name == "rmf_dock":
+                dock_marker_type = self.marker_type_keys['vl_marker']
+                dock_marker_type_guid = self.docking_offsets_guid_get(
+                    dock_marker_type)
+                marker_param = self.get_mission_params_with_value(
+                    mission_name, 'docking', 'dock_marker_type',
+                    dock_marker_type_guid)
+                mission_params = end_param + dock_param + marker_param
+
         else:
             mission_params = end_param
         return self.queue_mission_by_name(mission_name, mission_params)
@@ -415,6 +432,7 @@ class MirAPI:
 
     def queue_mission_by_name(self, mission_name, mission_params=None):
         mir_mission = self.known_missions.get(mission_name)
+        # assert not mission_name=="rmf_dock", (f"here, mission_name: {mission_name},    mir_mission: {mir_mission},    mission_params: {mission_params}")
         if mir_mission is None:
             return None
         mission_guid = mir_mission['guid']
@@ -979,4 +997,5 @@ class MirAPI:
                         # Let's only include this mission param to avoid error
                         mission_params = [p]
                         return mission_params
+        # assert mission_params is not None, ("mission_params is None")
         return mission_params
