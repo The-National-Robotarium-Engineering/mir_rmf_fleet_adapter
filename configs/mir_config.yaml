@@ -87,7 +87,8 @@ rmf_fleet:
         # base_url: "http://192.168.2.101/api/v2.0.0/"
         base_url: "http://192.168.12.20/api/v2.0.0/"
         user: "application/json"
-        password: "Basic c2syMDIzOjJmZjYzN2E4ZmU1NjEwNDNkM2U3MmIxMjY4ODM4ZjUwMWRkYWYwNDE3NjMzMjhkYzVjZWQ0ZWE2YzZlZDY2YjE="
+        password: "some_password" # Get password from MiR platform
+      
 
   robot_state_update_frequency: 1
   debug: False # whether to enable debug printouts from EasyFullControl
