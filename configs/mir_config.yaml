@@ -8,29 +8,24 @@ node_names:
 # Conversions between RMF data and MiR data
 conversions:
   reference_coordinates:
-    L1: # Map name
-      rmf: [[0.0, 0.0],
-            [0.0, 1.0],
-            [1.0, 1.0],
-            [1.0, 0.0]]
-      mir: [[0.0, 0.0],
-            [0.0, 1.0],
-            [1.0, 1.0],
-            [1.0, 0.0]]
-    L2:
-      rmf: [[0.0, 0.0],
-            [0.0, 1.0],
-            [1.0, 1.0],
-            [1.0, 0.0]]
-      mir: [[0.0, 0.0],
-            [0.0, 1.0],
-            [1.0, 1.0],
-            [1.0, 0.0]]
+    L1:
+      rmf: [[20.9293, -20.5446], # holding
+            [22.1585, -20.1347], # dropoff
+            [20.822, -23.5554], # charger_48v
+            [17.88623834931282, -20.079154107382116], # walkway_entry
+            [15.856994, -19.465046]] # vl_marker
+
+      mir: [[11.133, 15.842], # holding
+            [12.57, 15.8],  # dropoff
+            [11.095, 14.244], # charger_48v
+            [8.55, 16.254], # walkway_entry
+            [7.149,16.816]]  # vl_marker
+
+
 
   maps:
     # "RMF map name": "Map name stored on MiR"
-    L1: "Level 1"
-    L2: "Level 2"
+    L1: "raslab"
 
   missions:
     move: "rmf_move" # This mission must be predefined
@@ -39,15 +34,16 @@ conversions:
     go_to: "rmf_move_to_position"
 
   lift_positions:
-    lift_1: # Name of lift matching the navigation graph
-      L1:
-        name: "Level_1_Lift" # Name of lift position stored on the robot on this map
-        # tolerance: 0.3
-      L2:
-        name: "Level_2_Lift"
+    # lift_1: # Name of lift matching the navigation graph
+    #   L1:
+    #     name: "Level_1_Lift" # Name of lift position stored on the robot on this map
+    #     # tolerance: 0.3
+    #   L2:
+    #     name: "Level_2_Lift"
 
   marker_types:
-    "charger": "Narrow asymmetric MiR500/1000 shelf"
+    "charger": "MiR Charge 48V" # Name of charger marker type stored on MiR
+    "vl_marker": "VL-marker"
 
 # RMF Fleet parameters
 rmf_fleet:
@@ -56,8 +52,8 @@ rmf_fleet:
     linear: [0.7, 0.3] # velocity, acceleration
     angular: [1.0, 0.45]
   profile: # Robot profile is modelled as a circle
-    footprint: 0.4
-    vicinity: 0.5
+    footprint: 0.3
+    vicinity: 0.2
   reversible: False
   battery_system:
     voltage: 24.0
@@ -79,17 +75,19 @@ rmf_fleet:
     loop: True
     delivery: True
     clean: False
-  finishing_request: "charge" # [park, charge, nothing]
+  finishing_request: "nothing" # [park, charge, nothing]
   actions: ["delivery_pickup", "delivery_dropoff"]
   robots:
     mir_1:
-      charger: "Charger_1"
+      charger: "charger_48v"
+      vl_marker: "vl_marker"
       max_merge_waypoint_distance: 0.25
       max_merge_lane_distance: 1.0
       mir_config:
-        base_url: "http://some.ip.address/api/v2.0.0/"
+        # base_url: "http://192.168.2.101/api/v2.0.0/"
+        base_url: "http://192.168.12.20/api/v2.0.0/"
         user: "application/json"
-        password: "Basic HASH_OF_PASSWORD_OBTAINED_AT_API_DOCUMENTATION_PAGE"
+        password: "Basic c2syMDIzOjJmZjYzN2E4ZmU1NjEwNDNkM2U3MmIxMjY4ODM4ZjUwMWRkYWYwNDE3NjMzMjhkYzVjZWQ0ZWE2YzZlZDY2YjE="
 
   robot_state_update_frequency: 1
   debug: False # whether to enable debug printouts from EasyFullControl
@@ -106,36 +104,38 @@ plugins:
       exit_lot: "rmf_exit_lot" # Name of MiR mission for robot to exit from under a cart - to be created by fleet adapter upon launch
     marker_types:
       cart: "AsymmetricShelf" # Name of cart marker type
-    missions_json: "/home/some_user/mir_ws/src/fleet_adapter_mir/missions/rmf_cart_missions.json"  # Filepath to RMF cart delivery missions
+    missions_json: "/mir_ws/install/fleet_adapter_mir/share/fleet_adapter_mir/missions/rmf_cart_missions.json"  # Filepath to RMF cart delivery missions
     search_timeout: 60 # Dock to cart timeout in seconds
     # Examples of additional fields for cart detection module
     io_name: "MiR internal IOs"
     latch_io: 2
-  rmf_wait_until:
-    module: "fleet_adapter_mir_actions.rmf_wait_until"
-    actions: ["wait_until"]
-    default_timeout: 60 # Optional, in seconds. Timeout if there is no move-off signal received, after which robot will move off regardless. Default to 60 seconds.
-    update_gap: 30 # Optional, in seconds. The fleet adapter will log an update using this interval. Default to 30 seconds.
-    move_off_plugins: # Configure various move off signal plugins. If this field is not provided in the fleet config or task description, the robot will wait the full duration of the default timeout.
-      rmf_move_off_on_mission: "fleet_adapter_mir_actions.rmf_move_off_on_mission" # Fill in with path to custom plugin module written. Robot moves off when module provides the user-defined move off signal.
-      rmf_move_off_on_plc: "fleet_adapter_mir_actions.rmf_move_off_on_plc"
-      rmf_move_off_on_alert: "fleet_adapter_mir_actions.rmf_move_off_on_alert"
-      # Add your own custom move off plugin here
-    signals: # Provide some pre-configured parameters to the plugin to be used directly when the signal_name is called
-      sample_mission_1: # Only a unique signal_name
-        plugin: "rmf_move_off_on_mission"
-        mission_name: "some_mission_name" # If this mission is found on the robot, it will be queued when the action starts, and the robot will move off when the mission is completed.
-        retry_count: 10 # Optional field for signal type "mission". The fleet adapter will re-attempt queueing the mission for this number of tries.
-        resubmit_on_abort: False # Optional field for signal type "mission". Set to True to resubmit mission if the mission gets aborted by the robot. Default to False.
-      sample_mission_2:
-        plugin: "rmf_move_off_on_mission"
-        mission_name: "some_other_mission_name"
-      sample_plc_1:
-        plugin: "rmf_move_off_on_plc"
-        register: 20 # Fill in with PLC register number. Robot moves off when this PLC register returns True
-      sample_plc_2:
-        plugin: "rmf_move_off_on_plc"
-        register: 21
-      sample_alert_1:
-        plugin: "rmf_move_off_on_alert"
-    default_signal: "sample_alert_1" # Specifies a default signal name out of those configured above. If the task description does not provide any signal config, the fleet adapter will use this default signal.
+  
+  ##### Uncomment to have latched actions #####
+  # rmf_wait_until:
+  #   module: "fleet_adapter_mir_actions.rmf_wait_until"
+  #   actions: ["wait_until"]
+  #   default_timeout: 60 # Optional, in seconds. Timeout if there is no move-off signal received, after which robot will move off regardless. Default to 60 seconds.
+  #   update_gap: 30 # Optional, in seconds. The fleet adapter will log an update using this interval. Default to 30 seconds.
+  #   move_off_plugins: # Configure various move off signal plugins. If this field is not provided in the fleet config or task description, the robot will wait the full duration of the default timeout.
+  #     rmf_move_off_on_mission: "fleet_adapter_mir_actions.rmf_move_off_on_mission" # Fill in with path to custom plugin module written. Robot moves off when module provides the user-defined move off signal.
+  #     rmf_move_off_on_plc: "fleet_adapter_mir_actions.rmf_move_off_on_plc"
+  #     rmf_move_off_on_alert: "fleet_adapter_mir_actions.rmf_move_off_on_alert"
+  #     # Add your own custom move off plugin here
+  #   signals: # Provide some pre-configured parameters to the plugin to be used directly when the signal_name is called
+  #     sample_mission_1: # Only a unique signal_name
+  #       plugin: "rmf_move_off_on_mission"
+  #       mission_name: "some_mission_name" # If this mission is found on the robot, it will be queued when the action starts, and the robot will move off when the mission is completed.
+  #       retry_count: 10 # Optional field for signal type "mission". The fleet adapter will re-attempt queueing the mission for this number of tries.
+  #       resubmit_on_abort: False # Optional field for signal type "mission". Set to True to resubmit mission if the mission gets aborted by the robot. Default to False.
+  #     sample_mission_2:
+  #       plugin: "rmf_move_off_on_mission"
+  #       mission_name: "some_other_mission_name"
+  #     sample_plc_1:
+  #       plugin: "rmf_move_off_on_plc"
+  #       register: 20 # Fill in with PLC register number. Robot moves off when this PLC register returns True
+  #     sample_plc_2:
+  #       plugin: "rmf_move_off_on_plc"
+  #       register: 21
+  #     sample_alert_1:
+  #       plugin: "rmf_move_off_on_alert"
+  #   default_signal: "sample_alert_1" # Specifies a default signal name out of those configured above. If the task description does not provide any signal config, the fleet adapter will use this default signal.

@@ -1,0 +1,49 @@
+coordinate_system: reference_image
+crowd_sim:
+  agent_groups:
+    - {agents_name: [MiR_206000572], agents_number: 1, group_id: 0, profile_selector: external_agent, state_selector: external_static, x: 0, y: 0}
+  agent_profiles:
+    - {ORCA_tau: 1, ORCA_tauObst: 0.40000000000000002, class: 1, max_accel: 0, max_angle_vel: 0, max_neighbors: 10, max_speed: 0, name: external_agent, neighbor_dist: 5, obstacle_set: 1, pref_speed: 0, r: 0.25}
+  enable: 0
+  goal_sets: []
+  model_types: []
+  obstacle_set: {class: 1, file_name: L1_navmesh.nav, type: nav_mesh}
+  states:
+    - {final: 1, goal_set: -1, name: external_static, navmesh_file_name: ""}
+  transitions: []
+  update_time_step: 0.10000000000000001
+graphs:
+  {}
+levels:
+  L1:
+    drawing:
+      filename: mir_floor_plan.png
+    elevation: 0
+    floors:
+      - parameters: {ceiling_scale: [3, 1], ceiling_texture: [1, blue_linoleum], indoor: [2, 0], texture_name: [1, blue_linoleum], texture_rotation: [3, 0], texture_scale: [3, 1]}
+        vertices: [6, 9, 8, 7]
+    lanes:
+      - [1, 2, {bidirectional: [4, true], demo_mock_floor_name: [1, ""], demo_mock_lift_name: [1, ""], graph_idx: [2, 0], mutex: [1, ""], orientation: [1, ""], speed_limit: [3, 0]}]
+      - [0, 1, {bidirectional: [4, true], demo_mock_floor_name: [1, ""], demo_mock_lift_name: [1, ""], graph_idx: [2, 0], mutex: [1, ""], orientation: [1, ""], speed_limit: [3, 0]}]
+      - [1, 11, {bidirectional: [4, true], demo_mock_floor_name: [1, ""], demo_mock_lift_name: [1, ""], graph_idx: [2, 0], mutex: [1, ""], orientation: [1, ""], speed_limit: [3, 0]}]
+      - [11, 10, {bidirectional: [4, true], demo_mock_floor_name: [1, ""], demo_mock_lift_name: [1, ""], graph_idx: [2, 0], mutex: [1, ""], orientation: [1, ""], speed_limit: [3, 0]}]
+    layers:
+      {}
+    measurements:
+      - [3, 4, {distance: [3, 0.90000000000000002]}]
+      - [3, 5, {distance: [3, 0.79000000000000004]}]
+    vertices:
+      - [401.25299999999999, 453.91899999999998, 0, charger_48v, {dock_name: [1, "{\"description\": {\"end_waypoint\": \"charger_48v\"}, \"mission_name\": \"rmf_dock_and_charge\"}"], is_charger: [4, true], is_holding_point: [4, true], is_parking_spot: [4, true], spawn_robot_name: [1, MiR_206000572], spawn_robot_type: [1, MiR250]}]
+      - [403.31299999999999, 395.90100000000001, 0, holding, {is_holding_point: [4, true], is_parking_spot: [4, false]}]
+      - [428.73899999999998, 391.60599999999999, 0, dropoff, {dropoff_ingestor: [1, dropoff], is_holding_point: [4, true], is_parking_spot: [4, false]}]
+      - [457.02800000000002, 380.19200000000001, 0, ""]
+      - [456.303, 397.95100000000002, 0, ""]
+      - [471.887, 380.55399999999997, 0, ""]
+      - [232.31899999999999, 262.03899999999999, 0, ""]
+      - [638.24400000000003, 266.38799999999998, 0, ""]
+      - [640.78099999999995, 480.94799999999998, 0, ""]
+      - [223.25800000000001, 469.71300000000002, 0, ""]
+      - [305.56799999999998, 375.096, 0, vl_marker, {dock_name: [1, "{\"description\": {\"end_waypoint\": \"vl_marker\"}, \"mission_name\": \"rmf_dock\"}"], dropoff_ingestor: [1, moveit_ingestor], pickup_dispenser: [1, moveit_dispenser]}]
+      - [344.67200000000003, 386.93000000000001, 0, walkway_entry, {is_holding_point: [4, true], is_parking_spot: [4, false]}]
+lifts: {}
+name: raslab_03_09_2025

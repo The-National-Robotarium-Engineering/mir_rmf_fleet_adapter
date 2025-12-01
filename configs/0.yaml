@@ -1,0 +1,54 @@
+building_name: raslab_03_09_2025
+doors: {}
+levels:
+  L1:
+    lanes:
+    - - 0
+      - 1
+      - {}
+    - - 1
+      - 0
+      - {}
+    - - 2
+      - 0
+      - {undock_name: '{"description": {"end_waypoint": "charger_48v"}, "mission_name":
+          "rmf_dock_and_charge"}'}
+    - - 0
+      - 2
+      - {dock_name: '{"description": {"end_waypoint": "charger_48v"}, "mission_name":
+          "rmf_dock_and_charge"}'}
+    - - 0
+      - 3
+      - {}
+    - - 3
+      - 0
+      - {}
+    - - 3
+      - 4
+      - {dock_name: '{"description": {"end_waypoint": "vl_marker"}, "mission_name":
+          "rmf_dock"}'}
+    - - 4
+      - 3
+      - {undock_name: '{"description": {"end_waypoint": "vl_marker"}, "mission_name":
+          "rmf_dock"}'}
+    vertices:
+    - - 20.92932540901611
+      - -20.54469074578525
+      - {is_holding_point: true, is_parking_spot: false, name: holding}
+    - - 22.24876968145375
+      - -20.32180813939338
+      - {dropoff_ingestor: dropoff, is_holding_point: true, is_parking_spot: false,
+        name: dropoff}
+    - - 20.822424787556912
+      - -23.555448151522967
+      - {dock_name: '{"description": {"end_waypoint": "charger_48v"}, "mission_name":
+          "rmf_dock_and_charge"}', is_charger: true, is_holding_point: true, is_parking_spot: true,
+        name: charger_48v, spawn_robot_name: MiR_206000572, spawn_robot_type: MiR250}
+    - - 17.88623834931282
+      - -20.079154107382116
+      - {is_holding_point: true, is_parking_spot: false, name: walkway_entry}
+    - - 15.856994707788328
+      - -19.465046362552922
+      - {dock_name: '{"description": {"end_waypoint": "vl_marker"}, "mission_name":
+          "rmf_dock"}', dropoff_ingestor: moveit_ingestor, name: vl_marker, pickup_dispenser: moveit_dispenser}
+lifts: {}

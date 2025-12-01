@@ -20,7 +20,10 @@ setup(
     entry_points={
         'console_scripts': [
             'dispatch_delivery = fleet_adapter_mir_tasks.dispatch_delivery:main',
-            'dispatch_multistop = fleet_adapter_mir_tasks.dispatch_multistop:main'
+            'dispatch_multistop = fleet_adapter_mir_tasks.dispatch_multistop:main',
+            'dispatch_pickup = fleet_adapter_mir_tasks.dispatch_pickup:main',
+            'dispatch_go_to_place = fleet_adapter_mir_tasks.dispatch_go_to_place:main'
+            # 'dispatch_charge = fleet_adapter_mir_tasks.dispatch_charge:main'
         ],
     },
 )
