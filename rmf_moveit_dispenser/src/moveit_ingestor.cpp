@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <rmf_ingestor_msgs/msg/ingestor_request.hpp>
-#include <rmf_ingestor_msgs/msg/ingestor_result.hpp>
-#include <rmf_ingestor_msgs/msg/ingestor_state.hpp>
+#include <rmf_dispenser_msgs/msg/dispenser_request.hpp>
+#include <rmf_dispenser_msgs/msg/dispenser_result.hpp>
+#include <rmf_dispenser_msgs/msg/dispenser_state.hpp>
+
 #include <rclcpp/rclcpp.hpp>
 
 #include <chrono>
@@ -25,9 +26,9 @@
 using namespace std::chrono_literals;
 using json = nlohmann::json;
 
-using rmf_ingestor_msgs::msg::IngestorRequest;
-using rmf_ingestor_msgs::msg::IngestorResult;
-using rmf_ingestor_msgs::msg::IngestorState;
+using rmf_dispenser_msgs::msg::DispenserRequest;
+using rmf_dispenser_msgs::msg::DispenserResult;
+using rmf_dispenser_msgs::msg::DispenserState;
 
 /* PRE_GRASP
  * -11
@@ -82,17 +83,16 @@ public:
   MoveItFollowTarget();
 
 private:
-  void ingestor_request_callback(const IngestorRequest::ConstSharedPtr msg);
+  void dispenser_request_callback(const DispenserRequest::ConstSharedPtr msg);
 
   void timer_callback();
+  void publish_dispenser_state(bool busy);
+  void publish_dispenser_result(uint8_t result);
 
-  void publish_ingestor_state(bool busy);
-  void publish_ingestor_result(uint8_t result);
-
-  // RMF ingestor interfaces
-  rclcpp::Subscription<IngestorRequest>::SharedPtr ingestor_request_sub_;
-  rclcpp::Publisher<IngestorResult>::SharedPtr ingestor_result_pub_;
-  rclcpp::Publisher<IngestorState>::SharedPtr ingestor_state_pub_;
+  /// RMF dispenser interfaces
+  rclcpp::Subscription<DispenserRequest>::SharedPtr dispenser_request_sub_;
+  rclcpp::Publisher<DispenserResult>::SharedPtr dispenser_result_pub_;
+  rclcpp::Publisher<DispenserState>::SharedPtr dispenser_state_pub_;
 
   rclcpp::TimerBase::SharedPtr timer_;
   CURL *curl_;
@@ -106,9 +106,9 @@ MoveItFollowTarget::MoveItFollowTarget() : Node("moveit_ingestor")
   // Use upper joint velocity and acceleration limits
   // TODO(luca) Add the poses to the robot here instead of the srdf
 
-  ingestor_state_pub_ = this->create_publisher<IngestorState>("/ingestor_states", rclcpp::QoS(10));
-  ingestor_result_pub_ = this->create_publisher<IngestorResult>("/ingestor_results", rclcpp::QoS(10));
-  ingestor_request_sub_ = this->create_subscription<IngestorRequest>("/ingestor_requests", rclcpp::QoS(1), std::bind(&MoveItFollowTarget::ingestor_request_callback, this, std::placeholders::_1));
+  dispenser_state_pub_ = this->create_publisher<DispenserState>("/dispenser_states", rclcpp::QoS(10));
+  dispenser_result_pub_ = this->create_publisher<DispenserResult>("/dispenser_results", rclcpp::QoS(10));
+  dispenser_request_sub_ = this->create_subscription<DispenserRequest>("/dispenser_requests", rclcpp::QoS(1), std::bind(&MoveItFollowTarget::dispenser_request_callback, this, std::placeholders::_1));
   timer_ = this->create_wall_timer(500ms, std::bind(&MoveItFollowTarget::timer_callback, this));
   curl_ = curl_easy_init();
   RCLCPP_INFO(this->get_logger(), "Initialization successful.");
@@ -117,12 +117,12 @@ MoveItFollowTarget::MoveItFollowTarget() : Node("moveit_ingestor")
 void MoveItFollowTarget::timer_callback()
 {
   // Publish a dispenser state
-  this->publish_ingestor_state(false);
+  this->publish_dispenser_state(false);
 }
 
-void MoveItFollowTarget::publish_ingestor_state(bool busy)
+void MoveItFollowTarget::publish_dispenser_state(bool busy)
 {
-  IngestorState msg;
+  DispenserState msg;
   msg.time = this->get_clock()->now();
   msg.guid = "moveit_ingestor";
   if (busy)
@@ -134,20 +134,20 @@ void MoveItFollowTarget::publish_ingestor_state(bool busy)
   {
     msg.mode = msg.IDLE;
   }
-  ingestor_state_pub_->publish(msg);
+  dispenser_state_pub_->publish(msg);
 }
 
-void MoveItFollowTarget::publish_ingestor_result(uint8_t result)
+void MoveItFollowTarget::publish_dispenser_result(uint8_t result)
 {
-  IngestorResult msg;
+  DispenserResult msg;
   msg.time = this->get_clock()->now();
   msg.source_guid = "moveit_ingestor";
   msg.request_guid = this->last_request_guid_;
   msg.status = result;
-  ingestor_result_pub_->publish(msg);
+  dispenser_result_pub_->publish(msg);
 }
 
-void MoveItFollowTarget::ingestor_request_callback(const IngestorRequest::ConstSharedPtr msg)
+void MoveItFollowTarget::dispenser_request_callback(const DispenserRequest::ConstSharedPtr msg)
 {
   if (msg->target_guid != "moveit_ingestor")
     return;
@@ -155,8 +155,8 @@ void MoveItFollowTarget::ingestor_request_callback(const IngestorRequest::ConstS
     return;
   this->last_request_guid_ = msg->request_guid;
   this->past_request_guids_.insert(msg->request_guid);
-  this->publish_ingestor_result(IngestorResult::ACKNOWLEDGED);
-  this->publish_ingestor_state(true);
+  this->publish_dispenser_result(DispenserResult::ACKNOWLEDGED);
+  this->publish_dispenser_state(true);
   RCLCPP_INFO(this->get_logger(), "Received ingestor request");
   std::string readBuffer;
   curl_easy_setopt(curl_, CURLOPT_URL, "http://localhost:5000/unload");
@@ -165,17 +165,17 @@ void MoveItFollowTarget::ingestor_request_callback(const IngestorRequest::ConstS
   res_ = curl_easy_perform(curl_);
   curl_easy_cleanup(curl_);
   json parsed_json = json::parse(readBuffer);
-  std::cout << parsed_json["msg"] << std::endl; //TODO: move to ingestor callback and test
-  this->publish_ingestor_state(false);
+  std::cout << parsed_json["msg"] << std::endl; //TODO: move to dispenser callback and test
+  this->publish_dispenser_state(false);
   if (parsed_json["success"] == true)
   {
-    RCLCPP_INFO(this->get_logger(), "ingestor task succeeded.");
-    this->publish_ingestor_result(IngestorResult::SUCCESS);
+    RCLCPP_INFO(this->get_logger(), "Ingestor task succeeded.");
+    this->publish_dispenser_result(DispenserResult::SUCCESS);
   }
   else
   {
-    RCLCPP_INFO(this->get_logger(), "ingestor task failed.");
-    this->publish_ingestor_result(IngestorResult::FAILED);
+    RCLCPP_INFO(this->get_logger(), "Ingestor task failed.");
+    this->publish_dispenser_result(DispenserResult::FAILED);
   }
 }
 
