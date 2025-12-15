@@ -19,22 +19,23 @@ levels:
           "rmf_dock_and_charge"}'}
     - - 0
       - 3
-      - {}
-    - - 3
-      - 0
-      - {}
+      - {is_bidirectional: false}
     - - 3
       - 4
       - {dock_name: '{"description": {"end_waypoint": "vl_marker"}, "mission_name":
-          "rmf_dock"}'}
+          "rmf_dock"}', is_bidirectional: false}
     - - 4
-      - 3
-      - {undock_name: '{"description": {"end_waypoint": "vl_marker"}, "mission_name":
-          "rmf_dock"}'}
+      - 5
+      - {is_bidirectional: false, undock_name: '{"description": {"end_waypoint": "vl_marker"},
+          "mission_name": "rmf_dock"}'}
+    - - 5
+      - 0
+      - {is_bidirectional: false}
     vertices:
     - - 20.92932540901611
       - -20.54469074578525
-      - {is_holding_point: true, is_parking_spot: false, name: holding}
+      - {dropoff_ingestor: moveit_ingestor_dummy, is_holding_point: true, is_parking_spot: false,
+        name: holding, pickup_dispenser: moveit_dispenser_dummy}
     - - 22.24876968145375
       - -20.32180813939338
       - {dropoff_ingestor: dropoff, is_holding_point: true, is_parking_spot: false,
@@ -47,8 +48,11 @@ levels:
     - - 17.88623834931282
       - -20.079154107382116
       - {is_holding_point: true, is_parking_spot: false, name: walkway_entry}
-    - - 15.856994707788328
-      - -19.465046362552922
+    - - 16.167733019097877
+      - -18.490330647568406
       - {dock_name: '{"description": {"end_waypoint": "vl_marker"}, "mission_name":
           "rmf_dock"}', dropoff_ingestor: moveit_ingestor, name: vl_marker, pickup_dispenser: moveit_dispenser}
+    - - 17.919190725345143
+      - -19.95222259277571
+      - {name: walkway_exit}
 lifts: {}

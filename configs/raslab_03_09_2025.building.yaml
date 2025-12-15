@@ -25,8 +25,10 @@ levels:
     lanes:
       - [1, 2, {bidirectional: [4, true], demo_mock_floor_name: [1, ""], demo_mock_lift_name: [1, ""], graph_idx: [2, 0], mutex: [1, ""], orientation: [1, ""], speed_limit: [3, 0]}]
       - [0, 1, {bidirectional: [4, true], demo_mock_floor_name: [1, ""], demo_mock_lift_name: [1, ""], graph_idx: [2, 0], mutex: [1, ""], orientation: [1, ""], speed_limit: [3, 0]}]
-      - [1, 11, {bidirectional: [4, true], demo_mock_floor_name: [1, ""], demo_mock_lift_name: [1, ""], graph_idx: [2, 0], mutex: [1, ""], orientation: [1, ""], speed_limit: [3, 0]}]
-      - [11, 10, {bidirectional: [4, true], demo_mock_floor_name: [1, ""], demo_mock_lift_name: [1, ""], graph_idx: [2, 0], mutex: [1, ""], orientation: [1, ""], speed_limit: [3, 0]}]
+      - [1, 11, {bidirectional: [4, false], demo_mock_floor_name: [1, ""], demo_mock_lift_name: [1, ""], graph_idx: [2, 0], mutex: [1, ""], orientation: [1, ""], speed_limit: [3, 0]}]
+      - [11, 10, {bidirectional: [4, false], demo_mock_floor_name: [1, ""], demo_mock_lift_name: [1, ""], graph_idx: [2, 0], mutex: [1, ""], orientation: [1, ""], speed_limit: [3, 0]}]
+      - [10, 12, {bidirectional: [4, false], demo_mock_floor_name: [1, ""], demo_mock_lift_name: [1, ""], graph_idx: [2, 0], mutex: [1, ""], orientation: [1, ""], speed_limit: [3, 0]}]
+      - [12, 1, {bidirectional: [4, false], demo_mock_floor_name: [1, ""], demo_mock_lift_name: [1, ""], graph_idx: [2, 0], mutex: [1, ""], orientation: [1, ""], speed_limit: [3, 0]}]
     layers:
       {}
     measurements:
@@ -34,7 +36,7 @@ levels:
       - [3, 5, {distance: [3, 0.79000000000000004]}]
     vertices:
       - [401.25299999999999, 453.91899999999998, 0, charger_48v, {dock_name: [1, "{\"description\": {\"end_waypoint\": \"charger_48v\"}, \"mission_name\": \"rmf_dock_and_charge\"}"], is_charger: [4, true], is_holding_point: [4, true], is_parking_spot: [4, true], spawn_robot_name: [1, MiR_206000572], spawn_robot_type: [1, MiR250]}]
-      - [403.31299999999999, 395.90100000000001, 0, holding, {is_holding_point: [4, true], is_parking_spot: [4, false]}]
+      - [403.31299999999999, 395.90100000000001, 0, holding, {dropoff_ingestor: [1, moveit_ingestor_dummy], is_holding_point: [4, true], is_parking_spot: [4, false], pickup_dispenser: [1, moveit_dispenser_dummy]}]
       - [428.73899999999998, 391.60599999999999, 0, dropoff, {dropoff_ingestor: [1, dropoff], is_holding_point: [4, true], is_parking_spot: [4, false]}]
       - [457.02800000000002, 380.19200000000001, 0, ""]
       - [456.303, 397.95100000000002, 0, ""]
@@ -43,7 +45,8 @@ levels:
       - [638.24400000000003, 266.38799999999998, 0, ""]
       - [640.78099999999995, 480.94799999999998, 0, ""]
       - [223.25800000000001, 469.71300000000002, 0, ""]
-      - [305.56799999999998, 375.096, 0, vl_marker, {dock_name: [1, "{\"description\": {\"end_waypoint\": \"vl_marker\"}, \"mission_name\": \"rmf_dock\"}"], dropoff_ingestor: [1, moveit_ingestor], pickup_dispenser: [1, moveit_dispenser]}]
+      - [311.55599999999998, 356.31299999999999, 0, vl_marker, {dock_name: [1, "{\"description\": {\"end_waypoint\": \"vl_marker\"}, \"mission_name\": \"rmf_dock\"}"], dropoff_ingestor: [1, moveit_ingestor], pickup_dispenser: [1, moveit_dispenser]}]
       - [344.67200000000003, 386.93000000000001, 0, walkway_entry, {is_holding_point: [4, true], is_parking_spot: [4, false]}]
+      - [345.30700000000002, 384.48399999999998, 0, walkway_exit]
 lifts: {}
 name: raslab_03_09_2025
